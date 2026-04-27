@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axiom Service Profile — Candidate Assessment</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Arial',sans-serif;background:#F7F5F1;color:#2C2C2C;min-height:100vh}
+  :root{--navy:#1B2B4B;--gold:#B8973A;--light:#F7F5F1;--mid:#6B6B6B;--dark:#2C2C2C;--white:#fff}
+
+  /* ── screens ── */
+  .screen{display:none;min-height:100vh}
+  .screen.active{display:block}
+
+  /* ── cover ── */
+  #s-cover{background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center}
+  #s-cover h1{font-size:42px;color:var(--white);letter-spacing:3px;font-weight:700}
+  #s-cover .sub{font-size:14px;color:var(--gold);letter-spacing:5px;font-weight:700;margin-top:8px}
+  #s-cover .divider{width:80px;height:2px;background:var(--gold);margin:28px auto}
+  #s-cover p{color:#ccc;font-size:15px;max-width:520px;line-height:1.7}
+  #s-cover .tag{display:inline-block;border:1px solid var(--gold);color:var(--gold);font-size:12px;letter-spacing:3px;padding:6px 18px;margin-top:10px}
+  #s-cover .btn-start{margin-top:48px;background:var(--gold);color:var(--navy);font-size:14px;font-weight:700;letter-spacing:2px;border:none;padding:16px 44px;cursor:pointer;transition:opacity .2s}
+  #s-cover .btn-start:hover{opacity:.85}
+  #s-cover .notice{color:#888;font-size:12px;margin-top:20px;letter-spacing:1px}
+
+  /* ── section intro ── */
+  #s-intro{background:var(--navy)}
+  .intro-inner{max-width:640px;margin:0 auto;padding:80px 40px;text-align:center}
+  .intro-num{font-size:11px;color:var(--gold);letter-spacing:5px;font-weight:700}
+  .intro-title{font-size:38px;color:var(--white);font-weight:700;margin-top:12px;letter-spacing:2px}
+  .intro-tagline{font-size:14px;color:var(--gold);letter-spacing:3px;margin-top:6px;font-style:italic}
+  .intro-divider{width:60px;height:2px;background:var(--gold);margin:28px auto}
+  .intro-desc{color:#bbb;font-size:15px;line-height:1.75;max-width:480px;margin:0 auto}
+  .intro-count{margin-top:28px;color:#888;font-size:13px;letter-spacing:1px}
+  .btn-begin{margin-top:44px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-size:13px;letter-spacing:3px;padding:14px 40px;cursor:pointer;transition:all .2s}
+  .btn-begin:hover{background:var(--gold);color:var(--navy)}
+
+  /* ── question ── */
+  #s-question{background:var(--light)}
+  .q-header{background:var(--navy);padding:18px 40px;display:flex;align-items:center;justify-content:space-between}
+  .q-header .brand{font-size:12px;color:var(--gold);letter-spacing:3px;font-weight:700}
+  .q-header .progress-wrap{flex:1;margin:0 40px}
+  .progress-bar{height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s}
+  .q-header .q-counter{font-size:12px;color:#888;letter-spacing:1px;white-space:nowrap}
+  .q-section-tag{text-align:center;padding:16px;background:var(--white);border-bottom:1px solid #e8e4de;font-size:11px;color:var(--gold);letter-spacing:4px;font-weight:700}
+  .q-body{max-width:680px;margin:0 auto;padding:60px 40px}
+  .q-text{font-size:20px;color:var(--dark);line-height:1.6;font-weight:400;margin-bottom:48px;min-height:80px}
+  .scale-labels{display:flex;justify-content:space-between;margin-bottom:12px}
+  .scale-labels span{font-size:11px;color:var(--mid);letter-spacing:1px}
+  .scale-btns{display:flex;gap:16px;justify-content:center;align-items:flex-end}
+  .scale-btn-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer}
+  .scale-btn{width:52px;height:52px;border-radius:50%;border:2px solid #d4cfc8;background:var(--white);cursor:pointer;font-size:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+  .scale-btn-wrap:hover .scale-btn{border-color:var(--gold)}
+  .scale-btn-wrap.selected .scale-btn{border-color:transparent}
+  .scale-btn-wrap:nth-child(1) .scale-btn{background:#f9e8e8;border-color:#e8b4b4}
+  .scale-btn-wrap:nth-child(2) .scale-btn{background:#fdf0e0;border-color:#e8cfa0}
+  .scale-btn-wrap:nth-child(3) .scale-btn{background:#f0f0f0;border-color:#cccccc}
+  .scale-btn-wrap:nth-child(4) .scale-btn{background:#e4f0ea;border-color:#9fcfb0}
+  .scale-btn-wrap:nth-child(5) .scale-btn{background:#d4ede0;border-color:#5aaa80}
+  .scale-btn-wrap.selected:nth-child(1) .scale-btn{background:#E5185A;border-color:#E5185A}
+  .scale-btn-wrap.selected:nth-child(2) .scale-btn{background:#F4811F;border-color:#F4811F}
+  .scale-btn-wrap.selected:nth-child(3) .scale-btn{background:#9B9B9B;border-color:#9B9B9B}
+  .scale-btn-wrap.selected:nth-child(4) .scale-btn{background:#4AA86A;border-color:#4AA86A}
+  .scale-btn-wrap.selected:nth-child(5) .scale-btn{background:#1B7A50;border-color:#1B7A50}
+  .scale-btn-lbl{font-size:10px;color:var(--mid);text-align:center;letter-spacing:.5px;max-width:64px;line-height:1.3}
+  .q-nav{display:flex;justify-content:space-between;margin-top:48px;align-items:center}
+  .btn-back{background:transparent;border:none;color:var(--mid);font-size:13px;cursor:pointer;letter-spacing:1px;padding:8px 0}
+  .btn-back:hover{color:var(--dark)}
+  .btn-next{background:var(--navy);color:var(--white);border:none;padding:14px 36px;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:opacity .2s}
+  .btn-next:hover{opacity:.85}
+  .btn-next:disabled{opacity:.3;cursor:not-allowed}
+
+  /* ── results ── */
+  #s-results{background:var(--light)}
+  .results-header{background:var(--navy);padding:40px;text-align:center}
+  .results-header h2{font-size:13px;color:var(--gold);letter-spacing:5px;font-weight:700}
+  .results-header h1{font-size:32px;color:var(--white);font-weight:700;margin-top:8px;letter-spacing:2px}
+  .results-body{max-width:760px;margin:0 auto;padding:40px 30px 80px}
+
+  /* archetype card */
+  .arch-card{background:var(--white);border-top:4px solid var(--gold);padding:36px;margin-bottom:28px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+  .arch-badge{display:inline-block;background:var(--navy);color:var(--gold);font-size:11px;letter-spacing:4px;font-weight:700;padding:6px 16px;margin-bottom:16px}
+  .arch-title{font-size:28px;font-weight:700;color:var(--navy)}
+  .arch-tagline{font-size:14px;color:var(--gold);letter-spacing:2px;margin-top:4px;font-style:italic}
+  .arch-divider{height:1px;background:#e8e4de;margin:20px 0}
+  .arch-desc{font-size:15px;color:var(--mid);line-height:1.75}
+  .arch-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .arch-tag{background:var(--light);border:1px solid #ddd;color:var(--mid);font-size:12px;letter-spacing:1px;padding:5px 12px}
+  .arch-secondary{font-size:13px;color:var(--mid);margin-top:16px;font-style:italic}
+
+  /* section label */
+  .r-section{font-size:11px;color:var(--gold);letter-spacing:5px;font-weight:700;margin:36px 0 16px;border-top:2px solid var(--navy);padding-top:20px}
+
+  /* talent cloud */
+  .talent-cloud{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:8px}
+  .tc-col{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .tc-cat{font-size:10px;color:var(--navy);letter-spacing:3px;font-weight:700;margin-bottom:4px;text-align:center}
+  .tc-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .tc-dot{border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+  .tc-dot:hover{transform:scale(1.1)}
+  .tc-label{font-size:10px;color:var(--mid);text-align:center;margin-top:4px;max-width:80px}
+  .tc-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;justify-content:center}
+  .tc-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--mid)}
+  .tc-legend-dot{width:12px;height:12px;border-radius:50%}
+
+  /* drive bars */
+  .drive-bars{display:flex;flex-direction:column;gap:16px}
+  .drive-bar-wrap{background:var(--white);padding:18px 24px;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+  .drive-bar-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .drive-bar-name{font-size:14px;font-weight:700;color:var(--navy);letter-spacing:1px}
+  .drive-bar-sub{font-size:11px;color:var(--mid)}
+  .drive-bar-track{height:6px;background:#e8e4de;border-radius:3px;overflow:hidden}
+  .drive-bar-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 1s}
+
+  /* mind cards */
+  .mind-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .mind-card{background:var(--white);padding:24px 20px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.05)}
+  .mind-card-dim{font-size:10px;color:var(--gold);letter-spacing:3px;font-weight:700;margin-bottom:12px}
+  .mind-card-result{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .mind-card-alt{font-size:12px;color:#bbb}
+  .mind-card-bar{height:4px;background:#e8e4de;border-radius:2px;margin:12px 0;overflow:hidden}
+  .mind-card-fill{height:100%;background:var(--navy);border-radius:2px}
+  .mind-card-desc{font-size:12px;color:var(--mid);line-height:1.6}
+
+  /* restart */
+  .btn-restart{display:block;margin:40px auto 0;background:transparent;border:1px solid var(--mid);color:var(--mid);font-size:12px;letter-spacing:3px;padding:12px 32px;cursor:pointer}
+  .btn-restart:hover{border-color:var(--navy);color:var(--navy)}
+
+  @media(max-width:600px){
+    .talent-cloud{grid-template-columns:repeat(3,1fr)}
+    .mind-cards{grid-template-columns:1fr}
+    .q-body{padding:40px 24px}
+    #s-cover h1{font-size:28px}
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div id="s-cover" class="screen active">
+  <div class="sub">AXIOM PLACEMENT CONSULTANCY</div>
+  <div class="divider"></div>
+  <h1>AXIOM SERVICE PROFILE</h1>
+  <div class="tag">CANDIDATE ASSESSMENT</div>
+  <p style="margin-top:28px">A specialized profile assessment designed for professionals in the ultra-high-net-worth private estate and luxury hospitality sector. Discover your service archetype, motivations, and cognitive style.</p>
+  <div class="divider"></div>
+  <p><strong style="color:#eee">Three dimensions.</strong> <span>36 questions. Approximately 8–12 minutes.</span></p>
+  <button class="btn-start" onclick="startAssessment()">BEGIN ASSESSMENT</button>
+  <p class="notice">CONFIDENTIAL · FOR AXIOM APC CANDIDATES ONLY</p>
+</div>
+
+<!-- SECTION INTRO -->
+<div id="s-intro" class="screen">
+  <div class="intro-inner">
+    <div class="intro-num" id="intro-num"></div>
+    <div class="intro-title" id="intro-title"></div>
+    <div class="intro-tagline" id="intro-tagline"></div>
+    <div class="intro-divider"></div>
+    <div class="intro-desc" id="intro-desc"></div>
+    <div class="intro-count" id="intro-count"></div>
+    <button class="btn-begin" onclick="beginSection()">BEGIN THIS SECTION</button>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="s-question" class="screen">
+  <div class="q-header">
+    <div class="brand">APC</div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+    <div class="q-counter" id="q-counter"></div>
+  </div>
+  <div class="q-section-tag" id="q-section-tag"></div>
+  <div class="q-body">
+    <div class="q-text" id="q-text"></div>
+    <div class="scale-btns" id="scale-btns">
+      <div class="scale-btn-wrap" onclick="select(1)"><div class="scale-btn"></div><div class="scale-btn-lbl">Strongly Disagree</div></div>
+      <div class="scale-btn-wrap" onclick="select(2)"><div class="scale-btn"></div><div class="scale-btn-lbl">Disagree</div></div>
+      <div class="scale-btn-wrap" onclick="select(3)"><div class="scale-btn"></div><div class="scale-btn-lbl">Neutral</div></div>
+      <div class="scale-btn-wrap" onclick="select(4)"><div class="scale-btn"></div><div class="scale-btn-lbl">Agree</div></div>
+      <div class="scale-btn-wrap" onclick="select(5)"><div class="scale-btn"></div><div class="scale-btn-lbl">Strongly Agree</div></div>
+    </div>
+    <div class="q-nav">
+      <button class="btn-back" onclick="goBack()">← BACK</button>
+      <button class="btn-next" id="btn-next" onclick="goNext()" disabled>NEXT →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="s-results" class="screen">
+  <div class="results-header">
+    <h2>YOUR AXIOM SERVICE PROFILE</h2>
+    <h1 id="r-arch-name"></h1>
+  </div>
+  <div class="results-body">
+    <div class="arch-card">
+      <div class="arch-badge" id="r-arch-badge"></div>
+      <div class="arch-title" id="r-arch-title"></div>
+      <div class="arch-tagline" id="r-arch-tagline"></div>
+      <div class="arch-divider"></div>
+      <div class="arch-desc" id="r-arch-desc"></div>
+      <div class="arch-tags" id="r-arch-tags"></div>
+      <div class="arch-secondary" id="r-arch-secondary"></div>
+    </div>
+
+    <div class="r-section">TALENT CLOUD</div>
+    <div class="talent-cloud" id="talent-cloud"></div>
+    <div class="tc-legend">
+      <div class="tc-legend-item"><div class="tc-legend-dot" style="background:#E5185A"></div>Signature strength</div>
+      <div class="tc-legend-item"><div class="tc-legend-dot" style="background:#F4811F"></div>Established skill</div>
+      <div class="tc-legend-item"><div class="tc-legend-dot" style="background:#F5C518"></div>Developing area</div>
+      <div class="tc-legend-item"><div class="tc-legend-dot" style="background:#2ECC9A"></div>Emerging quality</div>
+      <div class="tc-legend-item"><div class="tc-legend-dot" style="background:#CBD0D8"></div>Growth opportunity</div>
+    </div>
+
+    <div class="r-section">DRIVE PROFILE</div>
+    <div class="drive-bars" id="drive-bars"></div>
+
+    <div class="r-section">MIND PROFILE</div>
+    <div class="mind-cards" id="mind-cards"></div>
+
+    <button class="btn-restart" onclick="restart()">RETAKE ASSESSMENT</button>
+  </div>
+</div>
+
+<script>
+// ── Archetypes ─────────────────────────────────────────────────────────────
+var A = {
+  sentinel: {
+    name: 'The Sentinel',
+    badge: 'SERVICE ARCHETYPE',
+    tagline: 'The Trusted Guardian',
+    col: '#1B3A5C',
+    desc: 'You are the unseen force that makes a household feel secure. Sentinels lead with discretion, vigilance, and unwavering reliability. Principals trust you instinctively — not because you ask for it, but because you earn it quietly, every day. You notice what others miss, you protect without fanfare, and you hold the standard even when no one is watching.',
+    tags: ['#Discretion', '#Vigilance', '#TrustBuilding', '#PrivateService', '#Reliability'],
+    envs: ['Principal Residences', 'Security-Sensitive Households', 'Estate Management']
+  },
+  ambassador: {
+    name: 'The Ambassador',
+    badge: 'SERVICE ARCHETYPE',
+    tagline: 'The Face of the Household',
+    col: '#2A5C8A',
+    desc: 'You are at your best when you are the face of something greater than yourself. Ambassadors bring warmth, poise, and social intelligence to every interaction. You read a room before you enter it, calibrate your tone to the moment, and make every guest feel like the most important person present. Your hospitality is not a performance — it is an expression of genuine care elevated to an art form.',
+    tags: ['#HostingExcellence', '#SocialIntelligence', '#GuestExperience', '#RepresentationSkills', '#Warmth'],
+    envs: ['Estate Entertainment', 'Yacht & Private Aviation', 'Luxury Hotel Management']
+  },
+  steward: {
+    name: 'The Steward',
+    badge: 'SERVICE ARCHETYPE',
+    tagline: 'The Backbone of the Household',
+    col: '#3D5A3E',
+    desc: 'Where others see complexity, you see a system waiting to be optimized. Stewards are the operational heartbeat of a well-run household — coordinating vendors, managing inventories, anticipating needs before they are voiced, and ensuring that excellence is not a moment but a consistent standard. You derive deep satisfaction from order, and your principals derive peace of mind from you.',
+    tags: ['#HouseholdOperations', '#Coordination', '#ProcessThinking', '#StaffManagement', '#AnticipatingNeeds'],
+    envs: ['Large Private Estates', 'Multi-Property Households', 'Chief of Staff Roles']
+  },
+  curator: {
+    name: 'The Curator',
+    badge: 'SERVICE ARCHETYPE',
+    tagline: 'The Keeper of Excellence',
+    col: '#6B4C2A',
+    desc: 'You see details that others walk past. Curators bring an aesthetic sensibility and a specialist\'s precision to everything they touch — from the angle of a floral arrangement to the provenance of a wine, from the finish on silverware to the thread count that matters. Your knowledge is deep, your standards are exacting, and your value lies in elevating the ordinary into the exceptional.',
+    tags: ['#AttentionToDetail', '#AestheticSensibility', '#SpecialistKnowledge', '#Refinement', '#CraftMastery'],
+    envs: ['Fine Dining & Table Service', 'Wine & Cellar Management', 'Art & Collection Stewardship']
+  },
+  navigator: {
+    name: 'The Navigator',
+    badge: 'SERVICE ARCHETYPE',
+    tagline: 'The Strategic Problem-Solver',
+    col: '#4A3560',
+    desc: 'You are the person principals call when something is complicated and needs to get done. Navigators are natural problem-solvers — calm under pressure, resourceful in ambiguity, and skilled at turning a complex brief into a seamless execution. You think in systems and contingencies, and you are most energized when the stakes are high and the path is not obvious.',
+    tags: ['#LogisticsExcellence', '#CrisisManagement', '#StrategicThinking', '#Resourcefulness', '#PrincipalSupport'],
+    envs: ['Estate Director Roles', 'Travel & Lifestyle Management', 'Complex Multi-Stakeholder Households']
+  },
+  anchor: {
+    name: 'The Anchor',
+    badge: 'SERVICE ARCHETYPE',
+    tagline: 'The Constant in Every Storm',
+    col: '#1B2B4B',
+    desc: 'Every great household has an Anchor — the person who brings calm to chaos, continuity to transition, and warmth to the structure of daily life. You are emotionally intelligent, deeply patient, and you build relationships across the household that endure for years. You understand that private service at its finest is fundamentally human — and you show up for that humanity every single day.',
+    tags: ['#EmotionalIntelligence', '#LongTermRelationships', '#Stability', '#HouseholdHarmony', '#Adaptability'],
+    envs: ['Family Estates with Children', 'Long-Tenure Placement', 'Wellness-Centered Households']
+  }
+};
+
+var ARCH_KEYS = ['sentinel','ambassador','steward','curator','navigator','anchor'];
+
+// ── Drives ────────────────────────────────────────────────────────────────
+var DR = {
+  excellence: { name: 'Excellence', sub: 'Driven by mastery, standards, and the pursuit of the highest quality.' },
+  connection:  { name: 'Connection',  sub: 'Energized by relationships, human bonds, and belonging.' },
+  achievement: { name: 'Achievement', sub: 'Motivated by goals, accomplishment, and forward momentum.' },
+  autonomy:    { name: 'Autonomy',    sub: 'Fueled by self-direction, trust, and independent action.' }
+};
+
+// ── Talent Cloud ──────────────────────────────────────────────────────────
+var TC = [
+  { cat: 'SERVE',   items: ['Service Instinct', 'Anticipation', 'Presentation'] },
+  { cat: 'CONNECT', items: ['Warmth', 'Discretion', 'Communication'] },
+  { cat: 'THINK',   items: ['Foresight', 'Problem-Solving', 'Detail Orientation'] },
+  { cat: 'ACT',     items: ['Initiative', 'Reliability', 'Composure Under Pressure'] },
+  { cat: 'FEEL',    items: ['Emotional Intelligence', 'Adaptability', 'Household Harmony'] }
+];
+
+// ── Section Intros ────────────────────────────────────────────────────────
+var SECS = [
+  {
+    n: 'SECTION 1 OF 3',
+    t: 'PRESENCE',
+    tag: 'Who You Are in Service',
+    desc: 'This section explores your natural personality in a service environment — how you engage, how you present, and how you show up for the people you serve. There are no right or wrong answers.',
+    count: '18 questions'
+  },
+  {
+    n: 'SECTION 2 OF 3',
+    t: 'DRIVE',
+    tag: 'What Moves You Forward',
+    desc: 'This section explores your core motivations — the forces that energize you, sustain you through difficulty, and give meaning to your work.',
+    count: '12 questions'
+  },
+  {
+    n: 'SECTION 3 OF 3',
+    t: 'MIND',
+    tag: 'How You Think and Learn',
+    desc: 'This final section looks at your cognitive approach — how you make decisions, tackle tasks, and absorb new experiences in the field.',
+    count: '6 questions'
+  }
+];
+
+// ── Questions ─────────────────────────────────────────────────────────────
+// PRESENCE (Q0-Q17): 3 per archetype [sentinel x3, ambassador x3, steward x3, curator x3, navigator x3, anchor x3]
+// DRIVE (Q18-Q29): 3 per drive [excellence x3, connection x3, achievement x3, autonomy x3]
+// MIND (Q30-Q35): 3 pairs — Q30/Q31 = Decision Pace, Q32/Q33 = Task Approach, Q34/Q35 = Learning Style
+
+var Q = [
+  // SENTINEL (0-2)
+  { t: 'When I begin a new placement, I find myself mentally mapping vulnerabilities — in scheduling, in staffing gaps, in how information moves — before I start thinking about what I will enjoy about the role.', arch: 'sentinel' },
+  { t: 'The information I hold about a principal\'s private life feels to me like something entrusted, not merely known — a distinction that quietly shapes every conversation I have outside the household.', arch: 'sentinel' },
+  { t: 'I am more energized by knowing that things ran perfectly without incident than by any recognition I might receive for a visible success.', arch: 'sentinel' },
+  // AMBASSADOR (3-5)
+  { t: 'I notice when someone in a room is not quite at ease — and I feel a quiet pull to change that, regardless of whether it falls within my formal responsibilities.', arch: 'ambassador' },
+  { t: 'After a well-hosted evening, I find myself reflecting less on the menu or the flowers and more on whether each guest left feeling genuinely seen.', arch: 'ambassador' },
+  { t: 'High-protocol and formal social environments feel less like a performance to me and more like shifting into a register that comes naturally — one I find I can sustain without effort.', arch: 'ambassador' },
+  // STEWARD (6-8)
+  { t: 'When I inherit a household with no existing systems or documentation, my honest first reaction is a mixture of mild frustration and genuine excitement about the architecture I could build.', arch: 'steward' },
+  { t: 'The most stressful part of any complex operational challenge is rarely the challenge itself — it is the period before I have fully mapped all the moving parts and know where I stand.', arch: 'steward' },
+  { t: 'The moments that feel most professionally significant to me are the ones where I held to the highest standard precisely when no one would have noticed if I had let something slide.', arch: 'steward' },
+  // CURATOR (9-11)
+  { t: 'In a beautifully arranged room, I am often as conscious of what is slightly off as of what has been done well — and I find it genuinely difficult to settle until the former has been addressed.', arch: 'curator' },
+  { t: 'I have invested considerable personal time building expertise in at least one area that most professionals in private service treat as surface-level knowledge.', arch: 'curator' },
+  { t: 'When I travel or visit new environments, I tend to quietly catalogue details — textures, arrangements, techniques, sequences — with a vague sense that they may one day be useful.', arch: 'curator' },
+  // NAVIGATOR (12-14)
+  { t: 'When a situation deteriorates unexpectedly, I notice that my thinking actually sharpens rather than scatters — the emergency seems to simplify what matters and what does not.', arch: 'navigator' },
+  { t: 'I am more comfortable moving forward under ambiguity and correcting course than I am waiting for a complete picture before I act.', arch: 'navigator' },
+  { t: 'I have occasionally realized, after the fact, that I made a significant decision on a principal\'s behalf without quite registering that I was doing so — it simply felt like the obvious thing in the moment.', arch: 'navigator' },
+  // ANCHOR (15-17)
+  { t: 'The households I have served the longest are not simply workplaces I remember — they are relationships that have genuinely shaped who I am as a person.', arch: 'anchor' },
+  { t: 'When tension rises in a household — between staff, within a family, or during a difficult transition — I notice that people tend to gravitate toward me without my seeking it.', arch: 'anchor' },
+  { t: 'I am often aware of emotional undercurrents in a household that have not yet been named or spoken — and I have learned to sit with that awareness patiently, knowing that the right moment to act is rarely the first one available.', arch: 'anchor' },
+  // DRIVE: Excellence (18-20)
+  { t: 'I find it genuinely difficult to feel settled with work I know I could have done better, even when the outcome was perfectly acceptable to everyone else involved.', drive: 'excellence' },
+  { t: 'When I observe something done carelessly in a household I am part of — not by me, but around me — I feel a mild but persistent discomfort that is difficult to simply set aside.', drive: 'excellence' },
+  { t: 'My investment in professional development is not primarily about career advancement; it is closer to a personal obligation I feel toward the work itself and what it deserves from me.', drive: 'excellence' },
+  // DRIVE: Connection (21-23)
+  { t: 'The most genuinely difficult part of leaving a long-term placement is not the practical disruption — it is the particular quality of loss that comes from leaving people who have become quietly significant to me.', drive: 'connection' },
+  { t: 'Feeling genuinely appreciated by a principal or family has a different, more sustaining quality than a salary increase or a change in title — the two are not interchangeable for me.', drive: 'connection' },
+  { t: 'I know I am in the right placement when I find that I care about the well-being of the people I serve in ways that extend meaningfully beyond what my professional role requires.', drive: 'connection' },
+  // DRIVE: Achievement (24-26)
+  { t: 'I work with more energy and focus when I have a clear goal in front of me — even a self-imposed one that no one else is tracking or will notice.', drive: 'achievement' },
+  { t: 'I notice my engagement beginning to erode during extended stretches where I cannot see meaningful forward progress — not because I stop caring, but because motion is part of how I stay genuinely invested.', drive: 'achievement' },
+  { t: 'When I complete something difficult and do it well, there is a specific quality of satisfaction I experience that I find genuinely motivating — not pride exactly, but something close to it and harder to name.', drive: 'achievement' },
+  // DRIVE: Autonomy (27-29)
+  { t: 'I deliver my best work in environments where I am told clearly what excellence looks like and then trusted to get there without close monitoring of the path I take.', drive: 'autonomy' },
+  { t: 'When a manager monitors my work at a level of detail that seems disconnected from any genuine concern about outcomes, I find it genuinely difficult to sustain my usual level of engagement.', drive: 'autonomy' },
+  { t: 'I have noticed that I naturally take ownership of situations that are not technically within my remit — not out of territorial instinct, but because I can see something that needs doing and no one else appears to be doing it.', drive: 'autonomy' },
+  // MIND: Decision Pace (30=Decisive, 31=Deliberate)
+  { t: 'When I face a decision with incomplete information, I am more likely to move and recalibrate based on what I learn than to wait until the picture feels adequately complete.', mind: 'decisive' },
+  { t: 'I have learned to take seriously the discomfort I feel when I am asked to decide before I am properly ready — that discomfort usually signals something important that has not yet surfaced.', mind: 'deliberate' },
+  // MIND: Task Approach (32=Creative, 33=Structured)
+  { t: 'Even within a well-established routine, I find myself naturally looking for refinements — not because I am dissatisfied, but because the possibility of elevation is difficult for me to ignore.', mind: 'creative' },
+  { t: 'I find genuine freedom — not merely efficiency — in clear protocols and established ways of working; structure liberates my attention for the parts of the role that truly require judgment.', mind: 'structured' },
+  // MIND: Learning Style (34=Experiential, 35=Observational)
+  { t: 'I tend to learn most from being inside something — the refinements come to me in real time, through contact with the actual situation rather than through preparation for it.', mind: 'experiential' },
+  { t: 'I perform most confidently in new situations when I have had the chance to observe, research, and form a working mental model before I engage directly.', mind: 'observational' }
+];
+
+var TOTAL = Q.length; // 36
+
+// ── State ─────────────────────────────────────────────────────────────────
+var answers = new Array(TOTAL).fill(null);
+var currentQ = 0;
+var currentSecIdx = -1; // which section intro we last showed
+
+function secIdxForQ(qi) {
+  if (qi < 18) return 0;
+  if (qi < 30) return 1;
+  return 2;
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function startAssessment() {
+  currentQ = 0;
+  currentSecIdx = -1;
+  answers = new Array(TOTAL).fill(null);
+  showIntroIfNeeded();
+}
+
+function showIntroIfNeeded() {
+  var sec = secIdxForQ(currentQ);
+  if (sec !== currentSecIdx) {
+    currentSecIdx = sec;
+    var s = SECS[sec];
+    document.getElementById('intro-num').textContent = s.n;
+    document.getElementById('intro-title').textContent = s.t;
+    document.getElementById('intro-tagline').textContent = s.tag;
+    document.getElementById('intro-desc').textContent = s.desc;
+    document.getElementById('intro-count').textContent = s.count;
+    show('s-intro');
+  } else {
+    renderQuestion();
+  }
+}
+
+function beginSection() {
+  renderQuestion();
+}
+
+function renderQuestion() {
+  show('s-question');
+  var q = Q[currentQ];
+  var sec = secIdxForQ(currentQ);
+  var secName = SECS[sec].t;
+  var secStart = sec === 0 ? 0 : sec === 1 ? 18 : 30;
+  var secTotal = sec === 0 ? 18 : sec === 1 ? 12 : 6;
+  var qInSec = currentQ - secStart + 1;
+
+  document.getElementById('q-section-tag').textContent = secName + '  ·  QUESTION ' + qInSec + ' OF ' + secTotal;
+  document.getElementById('q-text').textContent = q.t;
+  document.getElementById('q-counter').textContent = (currentQ + 1) + ' / ' + TOTAL;
+  document.getElementById('progress-fill').style.width = ((currentQ / TOTAL) * 100) + '%';
+
+  var wraps = document.querySelectorAll('.scale-btn-wrap');
+  var saved = answers[currentQ];
+  wraps.forEach(function(w, i) {
+    w.classList.toggle('selected', saved === (i + 1));
+  });
+  document.getElementById('btn-next').disabled = (saved === null);
+}
+
+function select(v) {
+  answers[currentQ] = v;
+  var wraps = document.querySelectorAll('.scale-btn-wrap');
+  wraps.forEach(function(w, i) { w.classList.toggle('selected', (i + 1) === v); });
+  document.getElementById('btn-next').disabled = false;
+}
+
+function goNext() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < TOTAL - 1) {
+    currentQ++;
+    showIntroIfNeeded();
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  if (currentQ === 0) { show('s-cover'); return; }
+  currentQ--;
+  var prevSec = secIdxForQ(currentQ);
+  if (prevSec !== currentSecIdx) {
+    // just go to question, don't show intro again on back
+    currentSecIdx = prevSec;
+  }
+  renderQuestion();
+}
+
+function restart() {
+  currentQ = 0; currentSecIdx = -1;
+  answers = new Array(TOTAL).fill(null);
+  show('s-cover');
+}
+
+// ── Scoring ───────────────────────────────────────────────────────────────
+function scoreArchetypes() {
+  var scores = {};
+  ARCH_KEYS.forEach(function(k){ scores[k] = 0; });
+  Q.forEach(function(q, i) {
+    if (q.arch && answers[i] !== null) scores[q.arch] += answers[i];
+  });
+  return scores;
+}
+
+function scoreDrives() {
+  var keys = ['excellence','connection','achievement','autonomy'];
+  var scores = {};
+  keys.forEach(function(k){ scores[k] = 0; });
+  Q.forEach(function(q, i) {
+    if (q.drive && answers[i] !== null) scores[q.drive] += answers[i];
+  });
+  return scores;
+}
+
+function scoreMind() {
+  // Q30 Decisive vs Q31 Deliberate
+  var dec = answers[30] || 3;
+  var del = answers[31] || 3;
+  // Q32 Creative vs Q33 Structured
+  var cre = answers[32] || 3;
+  var str = answers[33] || 3;
+  // Q34 Experiential vs Q35 Observational
+  var exp = answers[34] || 3;
+  var obs = answers[35] || 3;
+  return [
+    { dim: 'DECISION PACE', aName: 'Decisive', bName: 'Deliberate', aScore: dec, bScore: del,
+      aDesc: 'You act on available information and course-correct in motion.',
+      bDesc: 'You gather and reflect before committing — you move thoughtfully.' },
+    { dim: 'TASK APPROACH', aName: 'Creative', bName: 'Structured', aScore: cre, bScore: str,
+      aDesc: 'You bring fresh thinking and inventive approaches to your work.',
+      bDesc: 'You thrive within clear systems, protocols, and expectations.' },
+    { dim: 'LEARNING STYLE', aName: 'Experiential', bName: 'Observational', aScore: exp, bScore: obs,
+      aDesc: 'You learn by doing — immersion and real-time adjustment is your mode.',
+      bDesc: 'You learn by watching and preparing — study before action.' }
+  ];
+}
+
+// Talent cloud: score each competency by averaging relevant archetypes
+// Map each TC item to archetype keys that contribute
+var TC_MAP = [
+  // SERVE
+  [['sentinel','steward'],['steward','anchor'],['ambassador','curator']],
+  // CONNECT
+  [['ambassador','anchor'],['sentinel','anchor'],['ambassador','anchor']],
+  // THINK
+  [['navigator','sentinel'],['navigator','steward'],['curator','sentinel']],
+  // ACT
+  [['navigator','steward'],['sentinel','anchor'],['navigator','anchor']],
+  // FEEL
+  [['anchor','ambassador'],['anchor','ambassador'],['anchor','steward']]
+];
+
+function archScore(key, archScores) {
+  return archScores[key] || 0; // 0-15 range
+}
+
+function tcDotScore(archKeys, archScores) {
+  var sum = 0;
+  archKeys.forEach(function(k){ sum += archScores[k]; });
+  return sum / archKeys.length; // 0-15
+}
+
+var DOT_COLORS = ['#E5185A','#F4811F','#F5C518','#2ECC9A','#CBD0D8'];
+var DOT_LABELS = ['Signature strength','Established skill','Developing area','Emerging quality','Growth opportunity'];
+
+function dotLevel(score) {
+  // score 0-15; bucket into 5 levels
+  if (score >= 12) return 0;
+  if (score >= 9)  return 1;
+  if (score >= 6)  return 2;
+  if (score >= 3)  return 3;
+  return 4;
+}
+function dotSize(level) {
+  var sizes = [52,42,34,26,20];
+  return sizes[level];
+}
+
+// ── Show Results ──────────────────────────────────────────────────────────
+function showResults() {
+  show('s-results');
+
+  var archScores = scoreArchetypes();
+  var driveScores = scoreDrives();
+  var mindData = scoreMind();
+
+  // Primary archetype
+  var sorted = ARCH_KEYS.slice().sort(function(a,b){ return archScores[b]-archScores[a]; });
+  var primary = sorted[0];
+  var secondary = sorted[1];
+  var arch = A[primary];
+
+  document.getElementById('r-arch-name').textContent = arch.name.toUpperCase();
+  document.getElementById('r-arch-badge').textContent = arch.badge;
+  document.getElementById('r-arch-title').textContent = arch.name;
+  document.getElementById('r-arch-tagline').textContent = arch.tagline;
+  document.getElementById('r-arch-desc').textContent = arch.desc;
+
+  var tagsEl = document.getElementById('r-arch-tags');
+  tagsEl.innerHTML = '';
+  arch.tags.forEach(function(t) {
+    var el = document.createElement('span');
+    el.className = 'arch-tag';
+    el.textContent = t;
+    tagsEl.appendChild(el);
+  });
+
+  document.getElementById('r-arch-secondary').textContent =
+    'Secondary archetype: ' + A[secondary].name + ' — ' + A[secondary].tagline;
+
+  // Talent Cloud
+  var tcEl = document.getElementById('talent-cloud');
+  tcEl.innerHTML = '';
+  TC.forEach(function(col, ci) {
+    var colDiv = document.createElement('div');
+    colDiv.className = 'tc-col';
+    var catDiv = document.createElement('div');
+    catDiv.className = 'tc-cat';
+    catDiv.textContent = col.cat;
+    colDiv.appendChild(catDiv);
+    var dotWrap = document.createElement('div');
+    dotWrap.className = 'tc-dot-wrap';
+    col.items.forEach(function(item, ii) {
+      var archs = TC_MAP[ci][ii];
+      var score = tcDotScore(archs, archScores);
+      var lvl = dotLevel(score);
+      var sz = dotSize(lvl);
+      var color = DOT_COLORS[lvl];
+      var dotDiv = document.createElement('div');
+      dotDiv.style.cssText = 'display:flex;flex-direction:column;align-items:center';
+      var dot = document.createElement('div');
+      dot.className = 'tc-dot';
+      dot.style.width = sz + 'px';
+      dot.style.height = sz + 'px';
+      dot.style.background = color;
+      dot.title = item + ' (' + DOT_LABELS[lvl] + ')';
+      var lbl = document.createElement('div');
+      lbl.className = 'tc-label';
+      lbl.textContent = item;
+      dotDiv.appendChild(dot);
+      dotDiv.appendChild(lbl);
+      dotWrap.appendChild(dotDiv);
+    });
+    colDiv.appendChild(dotWrap);
+    tcEl.appendChild(colDiv);
+  });
+
+  // Drive bars
+  var dbEl = document.getElementById('drive-bars');
+  dbEl.innerHTML = '';
+  var driveKeys = ['excellence','connection','achievement','autonomy'];
+  var maxDrive = 15;
+  driveKeys.forEach(function(k) {
+    var dr = DR[k];
+    var score = driveScores[k] || 0;
+    var pct = Math.round((score / maxDrive) * 100);
+    var wrap = document.createElement('div');
+    wrap.className = 'drive-bar-wrap';
+    wrap.innerHTML =
+      '<div class="drive-bar-label"><span class="drive-bar-name">' + dr.name.toUpperCase() + '</span><span class="drive-bar-sub">' + dr.sub + '</span></div>' +
+      '<div class="drive-bar-track"><div class="drive-bar-fill" style="width:0%" data-pct="' + pct + '"></div></div>';
+    dbEl.appendChild(wrap);
+  });
+  // Animate bars
+  setTimeout(function() {
+    document.querySelectorAll('.drive-bar-fill').forEach(function(el) {
+      el.style.width = el.getAttribute('data-pct') + '%';
+    });
+  }, 100);
+
+  // Mind cards
+  var mcEl = document.getElementById('mind-cards');
+  mcEl.innerHTML = '';
+  mindData.forEach(function(m) {
+    var aWins = m.aScore >= m.bScore;
+    var winner = aWins ? m.aName : m.bName;
+    var other = aWins ? m.bName : m.aName;
+    var desc = aWins ? m.aDesc : m.bDesc;
+    var pct = aWins
+      ? Math.round((m.aScore / (m.aScore + m.bScore)) * 100)
+      : Math.round((m.bScore / (m.aScore + m.bScore)) * 100);
+    var card = document.createElement('div');
+    card.className = 'mind-card';
+    card.innerHTML =
+      '<div class="mind-card-dim">' + m.dim + '</div>' +
+      '<div class="mind-card-result">' + winner + '</div>' +
+      '<div class="mind-card-alt">vs. ' + other + '</div>' +
+      '<div class="mind-card-bar"><div class="mind-card-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="mind-card-desc">' + desc + '</div>';
+    mcEl.appendChild(card);
+  });
+}
+
+// Initialize
+show('s-cover');
+</script>
+</body>
+</html>
